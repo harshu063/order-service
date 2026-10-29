@@ -3,6 +3,7 @@ package com.example.orderservice.application;
 import com.example.orderservice.domain.IdempotencyRecord;
 import com.example.orderservice.domain.Order;
 import com.example.orderservice.domain.OutboxEvent;
+import com.example.orderservice.domain.PaymentOutcomeInbox;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 interface OrderRepository extends JpaRepository<Order, String> {
+    Optional<Order> findByIdAndTenantId(String id, String tenantId);
+
     Optional<Order> findByIdAndTenantIdAndUserId(String id, String tenantId, String userId);
 
     @Query("""
@@ -37,4 +40,7 @@ interface IdempotencyRecordRepository extends JpaRepository<IdempotencyRecord, L
 }
 
 interface OutboxEventRepository extends JpaRepository<OutboxEvent, String> {
+}
+
+interface PaymentOutcomeInboxRepository extends JpaRepository<PaymentOutcomeInbox, String> {
 }

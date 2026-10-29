@@ -17,4 +17,8 @@ public final class OrderExceptions {
     public static class OrderNotFound extends RuntimeException {
         public OrderNotFound() { super("Order not found"); }
     }
+
+    public static class InvalidPaymentOutcome extends RuntimeException {
+        public InvalidPaymentOutcome(String message) { super(message); }
+    }
 }

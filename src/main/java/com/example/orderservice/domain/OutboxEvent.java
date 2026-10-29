@@ -14,7 +14,7 @@ import java.time.Instant;
                 columnNames = {"aggregate_type", "aggregate_id", "aggregate_version", "event_type"}))
 public class OutboxEvent {
     @Id
-    @Column(name = "event_id", length = 36, nullable = false)
+    @Column(name = "event_id", length = 36, columnDefinition = "CHAR(36)", nullable = false)
     private String eventId;
 
     @Column(name = "aggregate_type", length = 100, nullable = false)

@@ -7,6 +7,7 @@ import com.example.orderservice.domain.PaymentOutcomeInbox;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -43,4 +44,16 @@ interface OutboxEventRepository extends JpaRepository<OutboxEvent, String> {
 }
 
 interface PaymentOutcomeInboxRepository extends JpaRepository<PaymentOutcomeInbox, String> {
+    @Modifying
+    @Query(value = """
+            INSERT IGNORE INTO payment_outcome_inbox
+                (event_id, tenant_id, order_id, payment_id, event_type, processed_at)
+            VALUES (:eventId, :tenantId, :orderId, :paymentId, :eventType, :processedAt)
+            """, nativeQuery = true)
+    int claim(@Param("eventId") String eventId,
+              @Param("tenantId") String tenantId,
+              @Param("orderId") String orderId,
+              @Param("paymentId") String paymentId,
+              @Param("eventType") String eventType,
+              @Param("processedAt") Instant processedAt);
 }

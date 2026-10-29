@@ -3,7 +3,6 @@ package com.example.orderservice.application;
 import com.example.orderservice.domain.Order;
 import com.example.orderservice.domain.OrderStatus;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +22,9 @@ class PaymentOutcomeApplicationServiceTest {
         Order order = pendingOrder();
         PaymentOutcomeCommand command = command("payment.succeeded.v1", order.getId(), order.getTotalMinor());
         when(orders.findByIdAndTenantId(order.getId(), "tenant-a")).thenReturn(java.util.Optional.of(order));
+        when(inbox.claim(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())).thenReturn(1);
 
         PaymentOutcomeResult result = new PaymentOutcomeApplicationService(orders, inbox).apply(command);
 
@@ -37,8 +38,9 @@ class PaymentOutcomeApplicationServiceTest {
         OrderRepository orders = mock(OrderRepository.class);
         PaymentOutcomeInboxRepository inbox = mock(PaymentOutcomeInboxRepository.class);
         PaymentOutcomeCommand command = command("payment.failed.v1", UUID.randomUUID().toString(), 5000);
-        doThrow(new DataIntegrityViolationException("duplicate event"))
-                .when(inbox).saveAndFlush(org.mockito.ArgumentMatchers.any());
+        when(inbox.claim(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())).thenReturn(0);
 
         PaymentOutcomeResult result = new PaymentOutcomeApplicationService(orders, inbox).apply(command);
 
@@ -54,6 +56,9 @@ class PaymentOutcomeApplicationServiceTest {
         Order order = pendingOrder();
         PaymentOutcomeCommand command = command("payment.succeeded.v1", order.getId(), 4999);
         when(orders.findByIdAndTenantId(order.getId(), "tenant-a")).thenReturn(java.util.Optional.of(order));
+        when(inbox.claim(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())).thenReturn(1);
 
         assertThatThrownBy(() -> new PaymentOutcomeApplicationService(orders, inbox).apply(command))
                 .isInstanceOf(OrderExceptions.InvalidPaymentOutcome.class)
@@ -69,6 +74,9 @@ class PaymentOutcomeApplicationServiceTest {
         order.transitionTo(OrderStatus.PAYMENT_FAILED, Instant.parse("2026-10-01T00:01:00Z"));
         PaymentOutcomeCommand command = command("payment.succeeded.v1", order.getId(), order.getTotalMinor());
         when(orders.findByIdAndTenantId(order.getId(), "tenant-a")).thenReturn(java.util.Optional.of(order));
+        when(inbox.claim(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())).thenReturn(1);
 
         assertThatThrownBy(() -> new PaymentOutcomeApplicationService(orders, inbox).apply(command))
                 .isInstanceOf(OrderExceptions.InvalidPaymentOutcome.class)

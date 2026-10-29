@@ -11,16 +11,16 @@ import java.time.Instant;
 @Table(name = "payment_outcome_inbox")
 public class PaymentOutcomeInbox {
     @Id
-    @Column(name = "event_id", length = 36, nullable = false)
+    @Column(name = "event_id", length = 36, columnDefinition = "CHAR(36)", nullable = false)
     private String eventId;
 
     @Column(name = "tenant_id", length = 100, nullable = false)
     private String tenantId;
 
-    @Column(name = "order_id", length = 36, nullable = false)
+    @Column(name = "order_id", length = 36, columnDefinition = "CHAR(36)", nullable = false)
     private String orderId;
 
-    @Column(name = "payment_id", length = 36, nullable = false)
+    @Column(name = "payment_id", length = 36, columnDefinition = "CHAR(36)", nullable = false)
     private String paymentId;
 
     @Column(name = "event_type", length = 150, nullable = false)

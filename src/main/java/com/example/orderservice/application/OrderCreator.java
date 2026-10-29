@@ -7,6 +7,7 @@ import com.example.orderservice.application.OrderModels.CreateResult;
 import com.example.orderservice.application.OrderModels.PricedLine;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ class OrderCreator {
     private final ObjectMapper objectMapper;
     private final Clock clock;
 
+    @Autowired
     OrderCreator(OrderRepository orders, IdempotencyRecordRepository idempotencyRecords,
                  OutboxEventRepository outboxEvents, ObjectMapper objectMapper) {
         this(orders, idempotencyRecords, outboxEvents, objectMapper, Clock.systemUTC());

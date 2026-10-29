@@ -19,7 +19,7 @@ import java.util.List;
 @Table(name = "orders")
 public class Order {
     @Id
-    @Column(length = 36, nullable = false)
+    @Column(length = 36, columnDefinition = "CHAR(36)", nullable = false)
     private String id;
 
     @Column(name = "tenant_id", length = 100, nullable = false)
@@ -35,7 +35,7 @@ public class Order {
     @Column(name = "total_minor", nullable = false)
     private long totalMinor;
 
-    @Column(length = 3, nullable = false)
+    @Column(length = 3, columnDefinition = "CHAR(3)", nullable = false)
     private String currency;
 
     @Column(name = "aggregate_version", nullable = false)

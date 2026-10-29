@@ -2,8 +2,6 @@ package com.example.orderservice.application;
 
 import com.example.orderservice.domain.Order;
 import com.example.orderservice.domain.OrderStatus;
-import com.example.orderservice.domain.PaymentOutcomeInbox;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +25,9 @@ public class PaymentOutcomeApplicationService {
         String eventId = command.eventId().toString();
         OrderStatus target = targetStatus(command);
         validateEnvelope(command);
-        try {
-            inbox.saveAndFlush(new PaymentOutcomeInbox(eventId, command.tenantId(),
-                    command.payload().orderId().toString(), command.payload().paymentId().toString(),
-                    command.eventType(), Instant.now()));
-        } catch (DataIntegrityViolationException duplicate) {
+        int claimed = inbox.claim(eventId, command.tenantId(), command.payload().orderId().toString(),
+                command.payload().paymentId().toString(), command.eventType(), Instant.now());
+        if (claimed == 0) {
             return new PaymentOutcomeResult(true, null);
         }
         Order order = orders.findByIdAndTenantId(command.payload().orderId().toString(), command.tenantId())
